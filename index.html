@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <title>صن فلاور – العين السخنة</title>
 <meta name="description" content="منتجع صن فلاور على ساحل البحر الأحمر بالعين السخنة: فنادق للسياحة وشاليهات للتمليك">
 <meta property="og:title" content="صن فلاور – العين السخنة">
@@ -14,7 +14,9 @@
   :root { --bg: #0F1A24; --panel: #16283A; --gold: #D9A84E; --text: #F4EDE2; --muted: #B9C3CB; }
   * { box-sizing: border-box; margin: 0; }
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; overflow: hidden;
-               -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+               -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+               touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  .frame, .bar, button { touch-action: manipulation; }                     /* no double-tap zoom */
   .stage { position: fixed; inset: 0 0 64px 0; display: flex; align-items: center; justify-content: center; padding: 12px; }
   .frame { position: relative; width: min(100%, calc((100vh - 88px) * 16 / 9)); aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden;
            background: #000 center / contain no-repeat; box-shadow: 0 20px 60px rgba(0,0,0,0.5); transition: opacity .25s ease; }
@@ -67,8 +69,13 @@
     if (['ArrowLeft', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(cur + 1); }
     else if (['ArrowRight', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(cur - 1); }
     else if (e.key === 'Home') show(1); else if (e.key === 'End') show(N);
-    if ((e.ctrlKey || e.metaKey) && ['s', 'p'].includes(e.key.toLowerCase())) e.preventDefault();
+    if ((e.ctrlKey || e.metaKey) && ['s', 'p', '+', '=', '-', '_', '0'].includes(e.key.toLowerCase())) e.preventDefault();
   });
+  // no zoom: ctrl/cmd + wheel or trackpad pinch, iOS gesture events, multi-finger touch, double-tap
+  window.addEventListener('wheel', e => { if (e.ctrlKey || e.metaKey) e.preventDefault(); }, { passive: false });
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+  document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  document.addEventListener('dblclick', e => e.preventDefault());
   let tx = null;
   frame.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
   frame.addEventListener('touchend', e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 40) show(dx > 0 ? cur + 1 : cur - 1); tx = null; });
