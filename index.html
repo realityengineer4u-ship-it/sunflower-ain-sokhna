@@ -46,7 +46,7 @@
   <button id="fs" aria-label="ملء الشاشة">ملء الشاشة</button>
 </div>
 <script>
-  const N = 47, frame = document.getElementById('frame');
+  const N = 48, frame = document.getElementById('frame');
   const src = i => 's/' + String(i).padStart(2, '0') + '.webp';
   let cur = Math.min(Math.max(parseInt(location.hash.slice(1)) || 1, 1), N);
   const cache = {};
